@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { journeyOptions } from '../../data/mockData';
+import { useCollection } from '../../hooks/useDirectus';
 import ChoicesModal from '../modals/ChoicesModal';
 
 const typeIcons = {
@@ -21,6 +21,7 @@ const PlanJourney = () => {
 
   const [searchResults, setSearchResults] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [formData, setFormData] = useState({
     origin: '',
     destination: '',
@@ -30,6 +31,16 @@ const PlanJourney = () => {
     maxDuration: ''
   });
 
+  // Fetch journey options from Pacto MCP
+  const {
+    data: journeyOptions,
+    isLoading: optionsLoading,
+    error: optionsError,
+    refetch: refetchJourneys
+  } = useCollection('journey_options', {
+    limit: 100
+  });
+
   const handleChange = (e) => {
     setFormData(prev => ({
       ...prev,
@@ -37,23 +48,40 @@ const PlanJourney = () => {
     }));
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
-
+    setIsSearching(true);
     setSearchCriteria(formData);
 
-    let results = [...journeyOptions];
+    // Refetch data from Pacto MCP
+    await refetchJourneys();
+
+    // Filter results based on form data
+    let results = [...(journeyOptions || [])];
 
     if (formData.transportType) {
-      results = results.filter(j => j.type.toLowerCase() === formData.transportType.toLowerCase());
+      results = results.filter(j => j.type?.toLowerCase() === formData.transportType.toLowerCase());
     }
 
     if (formData.maxDuration) {
       results = results.filter(j => j.duration <= parseInt(formData.maxDuration));
     }
 
+    if (formData.origin) {
+      results = results.filter(j =>
+        j.origin?.toLowerCase().includes(formData.origin.toLowerCase())
+      );
+    }
+
+    if (formData.destination) {
+      results = results.filter(j =>
+        j.destination?.toLowerCase().includes(formData.destination.toLowerCase())
+      );
+    }
+
     setSearchResults(results);
-    showToast('Search Complete', `Found ${results.length} journey options`, 'success');
+    setIsSearching(false);
+    showToast('Search Complete', `Found ${results.length} journey options from Pacto MCP`, 'success');
   };
 
   const handleReset = () => {
@@ -74,6 +102,11 @@ const PlanJourney = () => {
         <div className="journey-search-panel">
           <div className="card-header">
             <h2>Search Journey Options</h2>
+            {optionsError && (
+              <span className="api-status error">
+                <i className="fas fa-exclamation-circle"></i> Pacto MCP unavailable
+              </span>
+            )}
           </div>
           <div className="card-body">
             <form onSubmit={handleSearch}>
@@ -153,9 +186,12 @@ const PlanJourney = () => {
                 </div>
               </div>
               <div className="form-actions">
-                <button type="submit" className="btn btn-primary">
-                  <i className="fas fa-search"></i>
-                  Search Journeys
+                <button type="submit" className="btn btn-primary" disabled={isSearching || optionsLoading}>
+                  {isSearching || optionsLoading ? (
+                    <><i className="fas fa-spinner fa-spin"></i> Searching...</>
+                  ) : (
+                    <><i className="fas fa-search"></i> Search Journeys</>
+                  )}
                 </button>
                 <button type="button" className="btn btn-secondary" onClick={handleReset}>
                   <i className="fas fa-undo"></i>
@@ -178,11 +214,16 @@ const PlanJourney = () => {
           </div>
           <div className="card-body">
             <div className="journey-results">
-              {searchResults.length === 0 ? (
+              {isSearching || optionsLoading ? (
+                <div className="loading-state">
+                  <i className="fas fa-spinner fa-spin"></i>
+                  <span>Fetching journey options from Pacto MCP...</span>
+                </div>
+              ) : searchResults.length === 0 ? (
                 <div className="empty-state">
                   <i className="fas fa-search"></i>
                   <h4>No Results Yet</h4>
-                  <p>Use the search form to find available journeys.</p>
+                  <p>Use the search form to find available journeys from Pacto MCP.</p>
                 </div>
               ) : (
                 searchResults.map(journey => (

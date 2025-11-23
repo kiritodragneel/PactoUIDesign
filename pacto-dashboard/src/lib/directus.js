@@ -1,7 +1,27 @@
 import { createDirectus, rest, authentication, readItems, createItem, updateItem, deleteItem } from '@directus/sdk';
 
-// Directus configuration
-const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || 'http://localhost:8055';
+/**
+ * Pacto MCP API Configuration
+ *
+ * This module configures the Directus SDK to connect to Pacto MCP.
+ * All data fetching in the application goes through this client.
+ *
+ * Environment Variables:
+ * - VITE_DIRECTUS_URL: The Pacto MCP API endpoint
+ * - VITE_PACTO_MCP_URL: Alternative Pacto MCP URL (fallback)
+ *
+ * Collections available in Pacto MCP:
+ * - dashboard_stats: Dashboard statistics and metrics
+ * - news_items: News feed items
+ * - collection_info: Metadata about available collections
+ * - journey_options: Available journey search results
+ * - stations: Train station markers
+ * - stops: Bus stop markers
+ * - hubs: Transport hub markers
+ * - incidents: Incident report markers
+ * - users, journeys, locations, routes, reports, activities, settings, media
+ */
+const DIRECTUS_URL = import.meta.env.VITE_DIRECTUS_URL || import.meta.env.VITE_PACTO_MCP_URL || 'http://localhost:8055';
 
 // Create Directus client
 const directus = createDirectus(DIRECTUS_URL)
