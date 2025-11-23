@@ -2,9 +2,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCollection, createRecord, updateRecord, deleteRecord } from '../lib/directus';
 
 /**
- * Hook to fetch data from a Directus collection
- * @param {string} collection - The name of the collection
- * @param {object} options - Query options for filtering, sorting, etc.
+ * Pacto MCP React Query Hooks
+ *
+ * These hooks provide easy access to Pacto MCP data with automatic caching,
+ * refetching, and state management via TanStack React Query.
+ *
+ * All hooks connect to the Pacto MCP API configured in lib/directus.js
+ */
+
+/**
+ * Hook to fetch data from a Pacto MCP collection
+ * @param {string} collection - The name of the collection in Pacto MCP
+ * @param {object} options - Query options for filtering, sorting, pagination etc.
+ * @returns {object} Query result with data, isLoading, error, and refetch
  */
 export const useCollection = (collection, options = {}) => {
   return useQuery({

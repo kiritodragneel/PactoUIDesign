@@ -1,5 +1,24 @@
-// Mock data for the application
-// In production, this would come from Directus
+/**
+ * Legacy Mock Data - DEPRECATED
+ *
+ * This file contains legacy mock data that was used before Pacto MCP integration.
+ * The application now fetches real data from Pacto MCP via the Directus SDK.
+ *
+ * Data Source: Pacto MCP (Directus)
+ * API Endpoint: Configured in .env (VITE_DIRECTUS_URL)
+ *
+ * This file is kept for reference and as a fallback structure.
+ * For actual data, see the following Pacto MCP collections:
+ * - dashboard_stats
+ * - news_items
+ * - collection_info
+ * - journey_options
+ * - stations
+ * - stops
+ * - hubs
+ * - incidents
+ * - users, journeys, locations, routes, reports, activities, settings, media
+ */
 
 export const collections = {
   users: [

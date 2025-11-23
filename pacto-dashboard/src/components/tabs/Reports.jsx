@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { useApp } from '../../context/AppContext';
-import { mapMarkers } from '../../data/mockData';
+import { useCollection } from '../../hooks/useDirectus';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for default marker icons in React-Leaflet
@@ -30,8 +30,8 @@ const markerIcons = {
 const createCustomIcon = (category) => {
   return L.divIcon({
     className: 'custom-marker',
-    html: `<div style="background: ${markerColors[category]}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
-      <i class="fas ${markerIcons[category]}" style="font-size: 14px;"></i>
+    html: `<div style="background: ${markerColors[category] || '#6366f1'}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+      <i class="fas ${markerIcons[category] || 'fa-map-marker-alt'}" style="font-size: 14px;"></i>
     </div>`,
     iconSize: [32, 32],
     iconAnchor: [16, 16]
@@ -41,6 +41,37 @@ const createCustomIcon = (category) => {
 const Reports = () => {
   const { activeMarkerType, setActiveMarkerType, showToast } = useApp();
   const [visibleMarkers, setVisibleMarkers] = useState(0);
+
+  // Fetch map markers from Pacto MCP
+  const {
+    data: stationsData,
+    isLoading: stationsLoading
+  } = useCollection('stations');
+
+  const {
+    data: stopsData,
+    isLoading: stopsLoading
+  } = useCollection('stops');
+
+  const {
+    data: hubsData,
+    isLoading: hubsLoading
+  } = useCollection('hubs');
+
+  const {
+    data: incidentsData,
+    isLoading: incidentsLoading
+  } = useCollection('incidents');
+
+  const isLoading = stationsLoading || stopsLoading || hubsLoading || incidentsLoading;
+
+  // Organize markers by category from Pacto MCP data
+  const mapMarkers = {
+    stations: (stationsData || []).map(s => ({ ...s, category: 'stations' })),
+    stops: (stopsData || []).map(s => ({ ...s, category: 'stops' })),
+    hubs: (hubsData || []).map(h => ({ ...h, category: 'hubs' })),
+    incidents: (incidentsData || []).map(i => ({ ...i, category: 'incidents' }))
+  };
 
   const getAllMarkers = () => {
     const all = [];
@@ -66,14 +97,14 @@ const Reports = () => {
 
   useEffect(() => {
     setVisibleMarkers(filteredMarkers.length);
-  }, [activeMarkerType]);
+  }, [activeMarkerType, filteredMarkers.length]);
 
   const handleToggleMarkers = (type) => {
     setActiveMarkerType(type);
   };
 
   const handleGenerateReport = () => {
-    showToast('Generating Report', 'PDF report is being generated...', 'info');
+    showToast('Generating Report', 'PDF report is being generated from Pacto MCP data...', 'info');
     setTimeout(() => {
       showToast('Report Ready', 'Your PDF report has been generated', 'success');
     }, 2000);
@@ -83,7 +114,8 @@ const Reports = () => {
     const data = {
       activeMarkers: activeMarkerType,
       markers: mapMarkers,
-      exportDate: new Date().toISOString()
+      exportDate: new Date().toISOString(),
+      source: 'Pacto MCP'
     };
 
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -91,11 +123,11 @@ const Reports = () => {
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = `map-data-${Date.now()}.json`;
+    a.download = `pacto-mcp-map-data-${Date.now()}.json`;
     a.click();
 
     URL.revokeObjectURL(url);
-    showToast('Export Complete', 'Map data has been exported', 'success');
+    showToast('Export Complete', 'Map data from Pacto MCP has been exported', 'success');
   };
 
   const totalMarkers = getAllMarkers().length;
@@ -106,6 +138,11 @@ const Reports = () => {
         <div className="map-controls-panel">
           <div className="card-header">
             <h2>Map Controls</h2>
+            {isLoading && (
+              <span className="loading-indicator">
+                <i className="fas fa-spinner fa-spin"></i>
+              </span>
+            )}
           </div>
           <div className="card-body">
             <div className="control-group">
@@ -166,42 +203,51 @@ const Reports = () => {
               <div className="map-stats">
                 <div className="map-stat">
                   <span className="stat-label">Total Markers</span>
-                  <span className="stat-value">{totalMarkers}</span>
+                  <span className="stat-value">{isLoading ? '-' : totalMarkers}</span>
                 </div>
                 <div className="map-stat">
                   <span className="stat-label">Visible</span>
-                  <span className="stat-value">{visibleMarkers}</span>
+                  <span className="stat-value">{isLoading ? '-' : visibleMarkers}</span>
                 </div>
                 <div className="map-stat">
-                  <span className="stat-label">Last Updated</span>
-                  <span className="stat-value">Just now</span>
+                  <span className="stat-label">Data Source</span>
+                  <span className="stat-value">Pacto MCP</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div className="map-panel">
-          <MapContainer
-            center={[51.5074, -0.1278]}
-            zoom={12}
-            style={{ height: '100%', width: '100%' }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            />
-            {filteredMarkers.map((marker, index) => (
-              <Marker
-                key={`${marker.category}-${index}`}
-                position={[marker.lat, marker.lng]}
-                icon={createCustomIcon(marker.category)}
-              >
-                <Popup>
-                  <b>{marker.name}</b><br />{marker.info}
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+          {isLoading ? (
+            <div className="loading-state map-loading">
+              <i className="fas fa-spinner fa-spin"></i>
+              <span>Loading map data from Pacto MCP...</span>
+            </div>
+          ) : (
+            <MapContainer
+              center={[51.5074, -0.1278]}
+              zoom={12}
+              style={{ height: '100%', width: '100%' }}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              />
+              {filteredMarkers.map((marker, index) => (
+                marker.lat && marker.lng && (
+                  <Marker
+                    key={`${marker.category}-${marker.id || index}`}
+                    position={[marker.lat, marker.lng]}
+                    icon={createCustomIcon(marker.category)}
+                  >
+                    <Popup>
+                      <b>{marker.name}</b><br />{marker.info || marker.description}
+                    </Popup>
+                  </Marker>
+                )
+              ))}
+            </MapContainer>
+          )}
         </div>
       </div>
     </section>
