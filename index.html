@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacto MCP Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-cube"></i>
+                    <span>Pacto MCP</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="#" class="nav-link active" data-tab="dashboard">
+                            <i class="fas fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-tab="view-data">
+                            <i class="fas fa-database"></i>
+                            <span>View Data</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-tab="plan-journey">
+                            <i class="fas fa-route"></i>
+                            <span>Plan Journey</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-tab="previous-journeys">
+                            <i class="fas fa-history"></i>
+                            <span>Previous Journeys</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-tab="reports">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-tab="profile">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="User" class="user-avatar">
+                    <div class="user-details">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search...">
+                    </div>
+                    <button class="header-btn notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="header-btn">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Tab Content -->
+            <div class="content-area">
+                <!-- Dashboard Tab -->
+                <section class="tab-content active" id="dashboard">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Total Journeys</h3>
+                                <p class="stat-value">1,284</p>
+                                <span class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 12.5%
+                                </span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Collections</h3>
+                                <p class="stat-value">48</p>
+                                <span class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 3.2%
+                                </span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon purple">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Reports Generated</h3>
+                                <p class="stat-value">342</p>
+                                <span class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i> 8.1%
+                                </span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Active Users</h3>
+                                <p class="stat-value">156</p>
+                                <span class="stat-change negative">
+                                    <i class="fas fa-arrow-down"></i> 2.4%
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="quick-actions-card">
+                            <div class="card-header">
+                                <h2>Quick Actions</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="action-buttons">
+                                    <button class="action-btn primary" onclick="switchToTab('plan-journey')">
+                                        <i class="fas fa-route"></i>
+                                        <span>Plan Journey</span>
+                                    </button>
+                                    <button class="action-btn secondary" onclick="generateMappingReport()">
+                                        <i class="fas fa-map"></i>
+                                        <span>Generate Mapping Report</span>
+                                    </button>
+                                    <button class="action-btn tertiary" onclick="switchToTab('view-data')">
+                                        <i class="fas fa-eye"></i>
+                                        <span>View Collections</span>
+                                    </button>
+                                    <button class="action-btn quaternary" onclick="switchToTab('reports')">
+                                        <i class="fas fa-chart-bar"></i>
+                                        <span>View Reports</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="news-feed-card">
+                            <div class="card-header">
+                                <h2>News Feed</h2>
+                                <button class="refresh-btn" onclick="refreshNewsFeed()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="news-feed" id="newsFeed">
+                                    <div class="news-item">
+                                        <div class="news-icon blue">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <div class="news-content">
+                                            <h4>System Update Available</h4>
+                                            <p>Version 2.4.1 is now available with improved mapping features.</p>
+                                            <span class="news-time">2 hours ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="news-item">
+                                        <div class="news-icon green">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div class="news-content">
+                                            <h4>Report Generation Complete</h4>
+                                            <p>Monthly mapping report has been successfully generated.</p>
+                                            <span class="news-time">5 hours ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="news-item">
+                                        <div class="news-icon purple">
+                                            <i class="fas fa-database"></i>
+                                        </div>
+                                        <div class="news-content">
+                                            <h4>New Collection Added</h4>
+                                            <p>Transportation data collection has been added to the system.</p>
+                                            <span class="news-time">1 day ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="news-item">
+                                        <div class="news-icon orange">
+                                            <i class="fas fa-user-plus"></i>
+                                        </div>
+                                        <div class="news-content">
+                                            <h4>New User Registration</h4>
+                                            <p>5 new users have registered in the last 24 hours.</p>
+                                            <span class="news-time">1 day ago</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="activity-card">
+                        <div class="card-header">
+                            <h2>Recent Activity</h2>
+                            <select class="filter-select">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option>Last 90 days</option>
+                            </select>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-chart" id="activityChart">
+                                <div class="chart-bars">
+                                    <div class="chart-bar" style="--height: 60%"><span>Mon</span></div>
+                                    <div class="chart-bar" style="--height: 80%"><span>Tue</span></div>
+                                    <div class="chart-bar" style="--height: 45%"><span>Wed</span></div>
+                                    <div class="chart-bar" style="--height: 90%"><span>Thu</span></div>
+                                    <div class="chart-bar" style="--height: 70%"><span>Fri</span></div>
+                                    <div class="chart-bar" style="--height: 40%"><span>Sat</span></div>
+                                    <div class="chart-bar" style="--height: 55%"><span>Sun</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- View Data Tab -->
+                <section class="tab-content" id="view-data">
+                    <div class="view-data-container">
+                        <div class="collections-sidebar">
+                            <div class="collections-header">
+                                <h3>Collections</h3>
+                                <div class="collections-search">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" placeholder="Search collections..." id="collectionSearch">
+                                </div>
+                            </div>
+                            <ul class="collections-list" id="collectionsList">
+                                <li class="collection-item" data-collection="users">
+                                    <i class="fas fa-users"></i>
+                                    <span>Users</span>
+                                    <span class="collection-count">156</span>
+                                </li>
+                                <li class="collection-item" data-collection="journeys">
+                                    <i class="fas fa-route"></i>
+                                    <span>Journeys</span>
+                                    <span class="collection-count">1,284</span>
+                                </li>
+                                <li class="collection-item" data-collection="locations">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Locations</span>
+                                    <span class="collection-count">892</span>
+                                </li>
+                                <li class="collection-item" data-collection="routes">
+                                    <i class="fas fa-road"></i>
+                                    <span>Routes</span>
+                                    <span class="collection-count">234</span>
+                                </li>
+                                <li class="collection-item" data-collection="reports">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>Reports</span>
+                                    <span class="collection-count">342</span>
+                                </li>
+                                <li class="collection-item" data-collection="activities">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Activities</span>
+                                    <span class="collection-count">5,621</span>
+                                </li>
+                                <li class="collection-item" data-collection="settings">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Settings</span>
+                                    <span class="collection-count">48</span>
+                                </li>
+                                <li class="collection-item" data-collection="media">
+                                    <i class="fas fa-images"></i>
+                                    <span>Media</span>
+                                    <span class="collection-count">1,205</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="data-preview">
+                            <div class="data-preview-header">
+                                <div class="preview-title">
+                                    <h3 id="selectedCollectionTitle">Select a Collection</h3>
+                                    <span class="record-count" id="recordCount"></span>
+                                </div>
+                                <div class="view-toggle">
+                                    <button class="view-btn active" data-view="table" title="Table View">
+                                        <i class="fas fa-table"></i>
+                                    </button>
+                                    <button class="view-btn" data-view="vertical" title="Vertical View">
+                                        <i class="fas fa-list"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="data-preview-body" id="dataPreviewBody">
+                                <div class="empty-state">
+                                    <i class="fas fa-database"></i>
+                                    <h4>No Collection Selected</h4>
+                                    <p>Select a collection from the sidebar to view its data.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Plan Journey Tab -->
+                <section class="tab-content" id="plan-journey">
+                    <div class="plan-journey-container">
+                        <div class="journey-search-panel">
+                            <div class="card-header">
+                                <h2>Search Journey Options</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="journeySearchForm">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="origin">Origin</label>
+                                            <input type="text" id="origin" placeholder="Enter starting point">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="destination">Destination</label>
+                                            <input type="text" id="destination" placeholder="Enter destination">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="journeyDate">Date</label>
+                                            <input type="date" id="journeyDate">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="journeyTime">Time</label>
+                                            <input type="time" id="journeyTime">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="transportType">Transport Type</label>
+                                            <select id="transportType">
+                                                <option value="">All Types</option>
+                                                <option value="bus">Bus</option>
+                                                <option value="train">Train</option>
+                                                <option value="metro">Metro</option>
+                                                <option value="tram">Tram</option>
+                                                <option value="ferry">Ferry</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="maxDuration">Max Duration (mins)</label>
+                                            <input type="number" id="maxDuration" placeholder="e.g., 60">
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search"></i>
+                                            Search Journeys
+                                        </button>
+                                        <button type="reset" class="btn btn-secondary">
+                                            <i class="fas fa-undo"></i>
+                                            Reset
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="journey-results-panel">
+                            <div class="card-header">
+                                <h2>Search Results</h2>
+                                <button class="btn btn-primary" id="viewChoicesBtn" style="display: none;" onclick="openChoicesModal()">
+                                    <i class="fas fa-eye"></i>
+                                    View Choices (<span id="selectedCount">0</span>)
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="journey-results" id="journeyResults">
+                                    <div class="empty-state">
+                                        <i class="fas fa-search"></i>
+                                        <h4>No Results Yet</h4>
+                                        <p>Use the search form to find available journeys.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Previous Journeys Tab -->
+                <section class="tab-content" id="previous-journeys">
+                    <div class="previous-journeys-container">
+                        <div class="card-header">
+                            <h2>Recommended Journeys</h2>
+                            <div class="header-actions">
+                                <button class="btn btn-secondary" onclick="exportJourneys()">
+                                    <i class="fas fa-download"></i>
+                                    Export
+                                </button>
+                                <button class="btn btn-danger" onclick="clearAllJourneys()">
+                                    <i class="fas fa-trash"></i>
+                                    Clear All
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="previous-journeys-list" id="previousJourneysList">
+                                <div class="empty-state">
+                                    <i class="fas fa-history"></i>
+                                    <h4>No Previous Journeys</h4>
+                                    <p>Recommended journeys will appear here after you submit them from the Plan Journey tab.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reports Tab -->
+                <section class="tab-content" id="reports">
+                    <div class="reports-container">
+                        <div class="map-controls-panel">
+                            <div class="card-header">
+                                <h2>Map Controls</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="control-group">
+                                    <h4>Marker Types</h4>
+                                    <div class="marker-buttons">
+                                        <button class="marker-btn active" data-marker="all" onclick="toggleMarkers('all')">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Show All
+                                        </button>
+                                        <button class="marker-btn" data-marker="stations" onclick="toggleMarkers('stations')">
+                                            <i class="fas fa-train"></i>
+                                            Stations
+                                        </button>
+                                        <button class="marker-btn" data-marker="stops" onclick="toggleMarkers('stops')">
+                                            <i class="fas fa-bus"></i>
+                                            Bus Stops
+                                        </button>
+                                        <button class="marker-btn" data-marker="hubs" onclick="toggleMarkers('hubs')">
+                                            <i class="fas fa-building"></i>
+                                            Transport Hubs
+                                        </button>
+                                        <button class="marker-btn" data-marker="incidents" onclick="toggleMarkers('incidents')">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            Incidents
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <h4>Report Actions</h4>
+                                    <div class="report-actions">
+                                        <button class="btn btn-primary" onclick="generateMapReport()">
+                                            <i class="fas fa-file-pdf"></i>
+                                            Generate PDF Report
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="exportMapData()">
+                                            <i class="fas fa-file-export"></i>
+                                            Export Data
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <h4>Statistics</h4>
+                                    <div class="map-stats">
+                                        <div class="map-stat">
+                                            <span class="stat-label">Total Markers</span>
+                                            <span class="stat-value" id="totalMarkers">24</span>
+                                        </div>
+                                        <div class="map-stat">
+                                            <span class="stat-label">Visible</span>
+                                            <span class="stat-value" id="visibleMarkers">24</span>
+                                        </div>
+                                        <div class="map-stat">
+                                            <span class="stat-label">Last Updated</span>
+                                            <span class="stat-value" id="lastUpdated">Just now</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="map-panel">
+                            <div id="map"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Profile Tab -->
+                <section class="tab-content" id="profile">
+                    <div class="profile-container">
+                        <div class="profile-header-card">
+                            <div class="profile-cover"></div>
+                            <div class="profile-info">
+                                <div class="profile-avatar-wrapper">
+                                    <img src="https://ui-avatars.com/api/?name=Admin+User&size=150&background=6366f1&color=fff" alt="Profile" class="profile-avatar">
+                                    <button class="avatar-edit-btn">
+                                        <i class="fas fa-camera"></i>
+                                    </button>
+                                </div>
+                                <div class="profile-details">
+                                    <h2>Admin User</h2>
+                                    <p>Administrator</p>
+                                    <div class="profile-meta">
+                                        <span><i class="fas fa-envelope"></i> admin@pacto-mcp.com</span>
+                                        <span><i class="fas fa-calendar"></i> Joined Jan 2024</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-content">
+                            <div class="profile-form-card">
+                                <div class="card-header">
+                                    <h3>Personal Information</h3>
+                                </div>
+                                <div class="card-body">
+                                    <form id="profileForm">
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="firstName">First Name</label>
+                                                <input type="text" id="firstName" value="Admin">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="lastName">Last Name</label>
+                                                <input type="text" id="lastName" value="User">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="email">Email Address</label>
+                                                <input type="email" id="email" value="admin@pacto-mcp.com">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="phone">Phone Number</label>
+                                                <input type="tel" id="phone" value="+1 (555) 123-4567">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="bio">Bio</label>
+                                            <textarea id="bio" rows="3" placeholder="Write a short bio...">System administrator with extensive experience in transportation data management.</textarea>
+                                        </div>
+                                        <div class="form-actions">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save"></i>
+                                                Save Changes
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="profile-settings-card">
+                                <div class="card-header">
+                                    <h3>Account Settings</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="settings-list">
+                                        <div class="setting-item">
+                                            <div class="setting-info">
+                                                <h4>Change Password</h4>
+                                                <p>Update your password regularly for security</p>
+                                            </div>
+                                            <button class="btn btn-secondary btn-sm">Change</button>
+                                        </div>
+                                        <div class="setting-item">
+                                            <div class="setting-info">
+                                                <h4>Two-Factor Authentication</h4>
+                                                <p>Add an extra layer of security to your account</p>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="setting-item">
+                                            <div class="setting-info">
+                                                <h4>Email Notifications</h4>
+                                                <p>Receive email updates about your account</p>
+                                            </div>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="setting-item">
+                                            <div class="setting-info">
+                                                <h4>Session Timeout</h4>
+                                                <p>Automatically logout after inactivity</p>
+                                            </div>
+                                            <select class="setting-select">
+                                                <option>15 minutes</option>
+                                                <option selected>30 minutes</option>
+                                                <option>1 hour</option>
+                                                <option>Never</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="danger-zone-card">
+                                <div class="card-header">
+                                    <h3>Danger Zone</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="danger-item">
+                                        <div class="danger-info">
+                                            <h4>Delete Account</h4>
+                                            <p>Permanently delete your account and all associated data. This action cannot be undone.</p>
+                                        </div>
+                                        <button class="btn btn-danger">Delete Account</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Choices Modal -->
+    <div class="modal" id="choicesModal">
+        <div class="modal-overlay" onclick="closeChoicesModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Selected Journey Choices</h2>
+                <button class="modal-close" onclick="closeChoicesModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="selected-choices-list" id="selectedChoicesList">
+                    <!-- Selected choices will be rendered here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeChoicesModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitJourneyRecommendations()">
+                    <i class="fas fa-check"></i>
+                    Submit Recommendations
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
